@@ -24,7 +24,7 @@ public class CityController {
     }
 
     @DeleteMapping("/city")
-    public ResponseEntity deleteCity(@RequestParam() String name) {
+    public ResponseEntity deleteCity(@RequestParam(value = "city") String name) {
         City town = repository.findByName(name);
         if (town != null) {
             repository.delete(town);
@@ -47,7 +47,7 @@ public class CityController {
     }
 
     @GetMapping("/city")
-    public ResponseEntity findCity(@RequestParam String name) {
+    public ResponseEntity findCity(@RequestParam(value = "city") String name) {
         City city = repository.findByName(name);
         if (city != null) {
             return new ResponseEntity(city.getText(), HttpStatus.OK);
