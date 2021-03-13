@@ -1,4 +1,4 @@
-package site.alex.konon.sol.telegramBot.Entity;
+package site.alex.konon.sol.telegramBot.entity;
 
 import javax.persistence.*;
 import java.util.Objects;

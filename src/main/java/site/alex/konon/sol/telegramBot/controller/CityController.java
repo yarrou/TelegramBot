@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import site.alex.konon.sol.telegramBot.Entity.City;
+import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 
 @RestController
@@ -14,35 +14,45 @@ public class CityController {
 
 
     @PostMapping("/city")
-    public ResponseEntity addNewCity(@RequestBody City city){
-        if (!repository.existsByName(city.getName())){
+    public ResponseEntity addNewCity(@RequestBody City city) {
+        if (!repository.existsByName(city.getName())) {
             repository.save(city);
-            return new ResponseEntity( HttpStatus.OK);
-        }else {
+            return new ResponseEntity(HttpStatus.OK);
+        } else {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
     @DeleteMapping("/city")
-    public ResponseEntity deleteCity(@RequestBody City city){
-        City town = repository.findByName(city.getName());
-        if (town!=null){
+    public ResponseEntity deleteCity(@RequestParam() String name) {
+        City town = repository.findByName(name);
+        if (town != null) {
             repository.delete(town);
-            return new ResponseEntity( HttpStatus.OK);
-        }else {
-            return new ResponseEntity("not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.OK);
+        } else {
+            return new ResponseEntity("not found", HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping("/city")
-    public ResponseEntity updateCity(@RequestBody City city){
+    public ResponseEntity updateCity(@RequestBody City city) {
         City town = repository.findByName(city.getName());
-        if (town!=null){
+        if (town != null) {
             town.setText(city.getText());
             repository.save(town);
-            return new ResponseEntity( HttpStatus.OK);
-        }else {
-            return new ResponseEntity("not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.OK);
+        } else {
+            return new ResponseEntity("not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/city")
+    public ResponseEntity findCity(@RequestParam String name) {
+        City city = repository.findByName(name);
+        if (city != null) {
+            return new ResponseEntity(city.getText(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 

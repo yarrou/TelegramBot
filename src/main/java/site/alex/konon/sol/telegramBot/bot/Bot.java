@@ -18,6 +18,7 @@ public class Bot extends TelegramLongPollingBot {
     private String botToken;
     @Autowired
     CityRepository repository;
+
     @Override
     public String getBotUsername() {
         return botUsername;
@@ -28,7 +29,7 @@ public class Bot extends TelegramLongPollingBot {
         return botToken;
     }
 
-    public void sendMsg(Message message, String text){
+    public void sendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(message.getChatId().toString());
@@ -36,8 +37,7 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setText(text);
         try {
             execute(sendMessage);
-        }
-        catch (TelegramApiException e){
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
@@ -45,18 +45,18 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        if(message != null && message.hasText()){
-            String city=message.getText();
+        if (message != null && message.hasText()) {
+            String city = message.getText();
             String answer = "Нам неизвестно о таком городе";
-            if (city.equals("/start")){
-                answer="Добро пожаловать.Введите точное название города";
+            if (city.equals("/start")) {
+                answer = "Добро пожаловать.Введите точное название города";
             }
 
-            if(repository.existsByName(city)){
+            if (repository.existsByName(city)) {
                 answer = repository.findByName(city).getText();
             }
 
-            sendMsg(message,answer);
+            sendMsg(message, answer);
         }
     }
 
