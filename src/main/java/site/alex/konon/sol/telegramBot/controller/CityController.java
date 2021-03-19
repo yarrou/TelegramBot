@@ -17,9 +17,9 @@ public class CityController {
     public ResponseEntity addNewCity(@RequestBody City city) {
         if (!repository.existsByName(city.getName())) {
             repository.save(city);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity("added",HttpStatus.OK);
         } else {
-            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("fail",HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
@@ -28,7 +28,7 @@ public class CityController {
         City town = repository.findByName(name);
         if (town != null) {
             repository.delete(town);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity("deleted",HttpStatus.OK);
         } else {
             return new ResponseEntity("not found", HttpStatus.NOT_FOUND);
         }
@@ -40,7 +40,7 @@ public class CityController {
         if (town != null) {
             town.setText(city.getText());
             repository.save(town);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity("changed",HttpStatus.OK);
         } else {
             return new ResponseEntity("not found", HttpStatus.NOT_FOUND);
         }
@@ -52,7 +52,7 @@ public class CityController {
         if (city != null) {
             return new ResponseEntity(city.getText(), HttpStatus.OK);
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity("not found",HttpStatus.NOT_FOUND);
         }
     }
 
