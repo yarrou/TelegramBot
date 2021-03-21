@@ -19,7 +19,7 @@ public class CityController {
             repository.save(city);
             return new ResponseEntity("added",HttpStatus.OK);
         } else {
-            return new ResponseEntity("fail",HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("already exists",HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
