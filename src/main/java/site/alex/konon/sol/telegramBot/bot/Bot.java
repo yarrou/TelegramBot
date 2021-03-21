@@ -8,7 +8,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
+
+import java.util.ArrayList;
 
 @Component
 public class Bot extends TelegramLongPollingBot {
@@ -46,14 +49,28 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
-            String city = message.getText();
-            String answer = "Нам неизвестно о таком городе";
-            if (city.equals("/start")) {
-                answer = "Добро пожаловать.Введите точное название города";
-            }
+            String cityName = message.getText();
+            String answer = "Нам неизвестно о таком городе.";
 
-            if (repository.existsByName(city)) {
-                answer = repository.findByName(city).getText();
+            ArrayList<City> cities = repository.findByNameStartingWith(cityName);
+            if (cityName.equals("/start")) {
+                answer = "Добро пожаловать.Введите название города или часть названия";
+            } else if (!cities.isEmpty()) {
+                if (cities.size() == 1) {
+                    City requedCity = cities.get(0);
+                    if (cityName.equals(requedCity.getName())) {
+                        answer = requedCity.getText();
+                    } else {
+                        answer = "Возможно вы имели в виду " + requedCity.getName() + " : " + requedCity.getText();
+                    }
+                } else {
+                    StringBuilder builder = new StringBuilder("По вашему запросу найдены следующие города : ");
+                    for (City city : cities) {
+                        builder.append(city.getName() + ",");
+                    }
+                    builder.append("пожалуйста уточните запрос.");
+                    answer = builder.toString();
+                }
             }
 
             sendMsg(message, answer);
