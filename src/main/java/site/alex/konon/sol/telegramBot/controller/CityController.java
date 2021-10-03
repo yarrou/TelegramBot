@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 
+import java.util.List;
+
 @RestController
 public class CityController {
     @Autowired
@@ -56,5 +58,12 @@ public class CityController {
         }
     }
 
+    @GetMapping("/find")
+    public ResponseEntity find(@RequestParam(value = "city") String name) {
+        List<City> cities = repository.findByNameStartingWith(name);
+        if (cities.size()>0){
+            return new ResponseEntity(cities,HttpStatus.OK);
+        }else return new ResponseEntity(cities,HttpStatus.NOT_FOUND);
+    }
 
 }
