@@ -16,7 +16,10 @@ BT_NM  -имя телеграм-бота
 BT_TKN  - токен телеграм-бота
 Добавление и изменение данных происходит с помощью запросов POST и PUT . 
 Удаление и получение информации происходит с помощью запросов DELETE и GET c параметром city.
-Смежным проектом является программа для взаимодействия с базой данной. https://github.com/yarrou/controllerForDBTelegramBot
+Смежным проектом является программа для взаимодействия с базой данных. https://github.com/yarrou/controllerForDBTelegramBot
+Также доступно android приложение для взаимодействия с базой данных. https://github.com/yarrou/ControllerForTelegramBot
+
+Тестовый образец бота доступен в Telegram по имени @test_turism_bot , REST сервис для него доступен по http://alexkononsol.site:8080
 
 web application for managing your own travel telegram bot.
 city data is stored in the Postgresql database. Adding, editing and deleting data occurs through the REST WebService.
@@ -30,3 +33,5 @@ BT_TKN - telegram bot token
 Adding and changing data is done using POST and PUT requests.
 Information is deleted and retrieved using DELETE and GET requests with the "city" parameter.
 A related project is a program for interacting with the database. https://github.com/yarrou/controllerForDBTelegramBot
+An android application for interacting with the database is also available. https://github.com/yarrou/ControllerForTelegramBot
+The test sample of the bot is available in Telegram by the name @test_turism_bot , the REST service for it is available by http://alexkononsol.site:8080
