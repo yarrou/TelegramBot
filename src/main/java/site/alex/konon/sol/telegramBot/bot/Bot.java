@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import site.alex.konon.sol.telegramBot.constants.*;
 import site.alex.konon.sol.telegramBot.controller.CityController;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
@@ -25,6 +26,8 @@ public class Bot extends TelegramLongPollingBot {
     private String botToken;
     @Autowired
     CityRepository repository;
+
+    ConstantsLocalization localization; //= new ConstantsEng();
 
     @Override
     public String getBotUsername() {
@@ -52,36 +55,53 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
+        setLocalization(message);
         String nameUser = message.getFrom().getUserName();
         String signatureUser = message.getFrom().toString();
         logger.info("new message from {} : {}",nameUser,signatureUser);
         if (message != null && message.hasText()) {
             String cityName = message.getText();
             logger.info("message is {}",cityName);
-            String answer = "Нам неизвестно о таком городе.";
+            String answer = localization.getUnknown();
 
             ArrayList<City> cities = repository.findByNameStartingWith(cityName);
             if (cityName.equals("/start")) {
-                answer = "Добро пожаловать.Введите название города или часть названия";
+                answer = localization.getGreeting();
             } else if (!cities.isEmpty()) {
                 if (cities.size() == 1) {
-                    City requedCity = cities.get(0);
-                    if (cityName.equals(requedCity.getName())) {
-                        answer = requedCity.getText();
+                    City requiredCity = cities.get(0);
+                    if (cityName.equals(requiredCity.getName())) {
+                        answer = requiredCity.getText();
                     } else {
-                        answer = "Возможно вы имели в виду " + requedCity.getName() + " : " + requedCity.getText();
+                        answer = localization.getSuggestion() + requiredCity.getName() + " : " + requiredCity.getText();
                     }
                 } else {
-                    StringBuilder builder = new StringBuilder("По вашему запросу найдены следующие города : ");
+                    StringBuilder builder = new StringBuilder(localization.getList());
                     for (City city : cities) {
                         builder.append(city.getName() + ",");
                     }
-                    builder.append("пожалуйста уточните запрос.");
+                    builder.append(localization.getClarify());
                     answer = builder.toString();
                 }
             }
 
             sendMsg(message, answer);
+        }
+    }
+    private void setLocalization(Message message){
+        String locale = message.getFrom().getLanguageCode();
+        switch (locale){
+            case ("ru"):
+                localization=new ConstantsRu();
+                break;
+            case ("de"):
+                localization = new ConstantsDe();
+                break;
+            case ("be"):
+                localization = new ConstantsBy();
+                break;
+            default:
+                localization = new ConstantsEng();
         }
     }
 }
