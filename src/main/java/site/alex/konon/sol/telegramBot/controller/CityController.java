@@ -8,6 +8,8 @@ import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import site.alex.konon.sol.telegramBot.validator.CityValidator;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -16,13 +18,20 @@ public class CityController {
 
     private static final Logger logger = LoggerFactory.getLogger(CityController.class);
 
-    @Autowired
+    final
     CityRepository repository;
+
+    public CityController(CityRepository repository) {
+        this.repository = repository;
+    }
 
 
     @PostMapping("/city")
     public ResponseEntity addNewCity(@RequestBody City city, HttpServletRequest request) {
         logger.info("new post connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
+        if(!CityValidator.cityValidate(city)){
+            return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
+        }
         if (!repository.existsByName(city.getName())) {
             repository.save(city);
             return new ResponseEntity("added",HttpStatus.OK);
@@ -46,6 +55,9 @@ public class CityController {
     @PutMapping("/city")
     public ResponseEntity updateCity(@RequestBody City city,HttpServletRequest request) {
         logger.info("new put connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
+        if (!CityValidator.cityValidate(city)){
+            return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
+        }
         City town = repository.findByName(city.getName());
         if (town != null) {
             town.setText(city.getText());
