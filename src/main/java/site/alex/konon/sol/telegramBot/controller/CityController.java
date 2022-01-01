@@ -11,6 +11,9 @@ import site.alex.konon.sol.telegramBot.validator.CityValidator;
 import site.alex.konon.sol.telegramBot.validator.TextValidator;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.crypto.Data;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,6 +36,8 @@ public class CityController {
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
         if (!repository.existsByName(city.getName())) {
+            city.setDateCreated(new Timestamp(new Date().getTime()));
+            city.setDateLastModification(new Timestamp(0));
             repository.save(city);
             return new ResponseEntity("added",HttpStatus.OK);
         } else {
@@ -64,6 +69,7 @@ public class CityController {
         City town = repository.findByName(city.getName());
         if (town != null) {
             town.setText(city.getText());
+            town.setDateLastModification(new Timestamp(new Date().getTime()));
             repository.save(town);
             return new ResponseEntity("changed",HttpStatus.OK);
         } else {
