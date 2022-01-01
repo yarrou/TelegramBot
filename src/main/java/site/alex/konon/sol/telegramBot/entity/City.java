@@ -1,6 +1,8 @@
 package site.alex.konon.sol.telegramBot.entity;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -12,8 +14,28 @@ public class City {
     @Column(columnDefinition="TEXT")
     private String text;
     private String name;
+    private Timestamp dateCreated;
+    private Timestamp dateLastModification;
 
     public City() {
+        this.dateCreated = new Timestamp(new Date().getTime());
+    }
+
+
+    public Timestamp getDateLastModification() {
+        return dateLastModification;
+    }
+
+    public void setDateLastModification(Timestamp dateLastModification) {
+        this.dateLastModification = dateLastModification;
+    }
+
+    public Timestamp getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Timestamp dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public long getId() {

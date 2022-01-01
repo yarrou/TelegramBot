@@ -1,6 +1,5 @@
 package site.alex.konon.sol.telegramBot.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +7,13 @@ import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import site.alex.konon.sol.telegramBot.validator.CityValidator;
+import site.alex.konon.sol.telegramBot.validator.TextValidator;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.crypto.Data;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -16,14 +21,23 @@ public class CityController {
 
     private static final Logger logger = LoggerFactory.getLogger(CityController.class);
 
-    @Autowired
+    final
     CityRepository repository;
+
+    public CityController(CityRepository repository) {
+        this.repository = repository;
+    }
 
 
     @PostMapping("/city")
     public ResponseEntity addNewCity(@RequestBody City city, HttpServletRequest request) {
         logger.info("new post connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
+        if(!CityValidator.cityValidate(city)){
+            return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
+        }
         if (!repository.existsByName(city.getName())) {
+            city.setDateCreated(new Timestamp(new Date().getTime()));
+            city.setDateLastModification(new Timestamp(0));
             repository.save(city);
             return new ResponseEntity("added",HttpStatus.OK);
         } else {
@@ -34,6 +48,9 @@ public class CityController {
     @DeleteMapping("/city")
     public ResponseEntity deleteCity(@RequestParam(value = "city") String name,HttpServletRequest request) {
         logger.info("new del connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
+        if (!TextValidator.noEmptyValidate(name)){
+            return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
+        }
         City town = repository.findByName(name);
         if (town != null) {
             repository.delete(town);
@@ -46,9 +63,13 @@ public class CityController {
     @PutMapping("/city")
     public ResponseEntity updateCity(@RequestBody City city,HttpServletRequest request) {
         logger.info("new put connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
+        if (!CityValidator.cityValidate(city)){
+            return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
+        }
         City town = repository.findByName(city.getName());
         if (town != null) {
             town.setText(city.getText());
+            town.setDateLastModification(new Timestamp(new Date().getTime()));
             repository.save(town);
             return new ResponseEntity("changed",HttpStatus.OK);
         } else {
@@ -59,6 +80,9 @@ public class CityController {
     @GetMapping("/city")
     public ResponseEntity findCity(@RequestParam(value = "city") String name, HttpServletRequest request) {
         logger.info("new get connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
+        if(!TextValidator.noEmptyValidate(name)){
+            return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
+        }
         City city = repository.findByName(name);
         if (city != null) {
             return new ResponseEntity(city.getText(), HttpStatus.OK);
@@ -68,7 +92,7 @@ public class CityController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity find(@RequestParam(value = "city") String name, HttpServletRequest request) {
+    public ResponseEntity search(@RequestParam(value = "city") String name, HttpServletRequest request) {
         logger.info("new find connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
         List<City> cities = repository.findByNameStartingWith(name);
         if (cities.size()>0){
