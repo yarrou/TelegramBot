@@ -7,13 +7,11 @@ import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import site.alex.konon.sol.telegramBot.services.impl.CityServiceImpl;
 import site.alex.konon.sol.telegramBot.validator.CityValidator;
 import site.alex.konon.sol.telegramBot.validator.TextValidator;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.crypto.Data;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -21,11 +19,11 @@ public class CityController {
 
     private static final Logger logger = LoggerFactory.getLogger(CityController.class);
 
-    final
-    CityRepository repository;
+    private final CityServiceImpl cityService;
 
-    public CityController(CityRepository repository) {
-        this.repository = repository;
+
+    public CityController(final CityServiceImpl cityService) {
+        this.cityService = cityService;
     }
 
 
@@ -35,10 +33,7 @@ public class CityController {
         if(!CityValidator.cityValidate(city)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
-        if (!repository.existsByName(city.getName())) {
-            city.setDateCreated(new Timestamp(new Date().getTime()));
-            city.setDateLastModification(new Timestamp(0));
-            repository.save(city);
+        if (cityService.addCity(city)) {
             return new ResponseEntity("added",HttpStatus.OK);
         } else {
             return new ResponseEntity("already exists",HttpStatus.NOT_ACCEPTABLE);
@@ -51,9 +46,7 @@ public class CityController {
         if (!TextValidator.noEmptyValidate(name)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
-        City town = repository.findByName(name);
-        if (town != null) {
-            repository.delete(town);
+        if(cityService.deleteCity(name)){
             return new ResponseEntity("deleted",HttpStatus.OK);
         } else {
             return new ResponseEntity("not found", HttpStatus.NOT_FOUND);
@@ -66,11 +59,7 @@ public class CityController {
         if (!CityValidator.cityValidate(city)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
-        City town = repository.findByName(city.getName());
-        if (town != null) {
-            town.setText(city.getText());
-            town.setDateLastModification(new Timestamp(new Date().getTime()));
-            repository.save(town);
+        if (cityService.changeCity(city)) {
             return new ResponseEntity("changed",HttpStatus.OK);
         } else {
             return new ResponseEntity("not found", HttpStatus.NOT_FOUND);
@@ -83,7 +72,7 @@ public class CityController {
         if(!TextValidator.noEmptyValidate(name)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
-        City city = repository.findByName(name);
+        City city = cityService.getCityByName(name);
         if (city != null) {
             return new ResponseEntity(city.getText(), HttpStatus.OK);
         } else {
@@ -94,7 +83,7 @@ public class CityController {
     @GetMapping("/find")
     public ResponseEntity search(@RequestParam(value = "city") String name, HttpServletRequest request) {
         logger.info("new find connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
-        List<City> cities = repository.findByNameStartingWith(name);
+        List<City> cities = cityService.findCity(name);
         if (cities.size()>0){
             return new ResponseEntity(cities,HttpStatus.OK);
         }else return new ResponseEntity(cities,HttpStatus.NOT_FOUND);
