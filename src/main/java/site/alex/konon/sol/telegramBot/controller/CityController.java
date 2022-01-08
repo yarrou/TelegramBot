@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import site.alex.konon.sol.telegramBot.entity.City;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import site.alex.konon.sol.telegramBot.services.impl.CityServiceImpl;
+import site.alex.konon.sol.telegramBot.services.CityService;
 import site.alex.konon.sol.telegramBot.validator.CityValidator;
 import site.alex.konon.sol.telegramBot.validator.TextValidator;
 
@@ -17,11 +17,9 @@ import java.util.List;
 public class CityController {
 
     private static final Logger logger = LoggerFactory.getLogger(CityController.class);
+    private final CityService cityService;
 
-    private final CityServiceImpl cityService;
-
-
-    public CityController(final CityServiceImpl cityService) {
+    public CityController(final CityService cityService) {
         this.cityService = cityService;
     }
 
