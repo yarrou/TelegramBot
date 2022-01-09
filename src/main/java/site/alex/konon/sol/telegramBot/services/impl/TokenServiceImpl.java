@@ -8,6 +8,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import site.alex.konon.sol.telegramBot.services.TokenService;
 
 import java.math.BigInteger;
@@ -16,6 +17,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+@Service
 public class TokenServiceImpl implements TokenService {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
@@ -51,7 +53,7 @@ public class TokenServiceImpl implements TokenService {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
         Instant now = Instant.now();
-        Instant exp = now.plus(6, ChronoUnit.MONTHS);
+        Instant exp = now.plus(182, ChronoUnit.DAYS);
 
         return JWT.create()
                 .withIssuer("auth-telegram_bot")
@@ -66,9 +68,6 @@ public class TokenServiceImpl implements TokenService {
     public  String getRandom(){
         byte[] bytes = new byte[32];
         new SecureRandom().nextBytes(bytes);
-        String secretKey = new BigInteger(1, bytes).toString(16);
-        return secretKey;
+        return new BigInteger(1, bytes).toString(16);
     }
-
-
 }
