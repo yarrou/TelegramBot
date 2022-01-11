@@ -1,7 +1,7 @@
 package site.alex.konon.sol.telegramBot.mapper.impl;
 
 import org.springframework.stereotype.Component;
-import site.alex.konon.sol.telegramBot.dao.UserFromRequest;
+import site.alex.konon.sol.telegramBot.dao.UserForm;
 import site.alex.konon.sol.telegramBot.entity.User;
 import site.alex.konon.sol.telegramBot.mapper.UserMapper;
 import site.alex.konon.sol.telegramBot.util.Cryptographer;
@@ -10,7 +10,7 @@ import site.alex.konon.sol.telegramBot.util.Cryptographer;
 public class UserMapperImpl implements UserMapper {
 
     @Override
-    public User userFromRequestToUser(UserFromRequest dao) {
+    public User userFromRequestToUser(UserForm dao) {
         String secret = Cryptographer.encrypt(dao.getPassword());
         User user = new User();
         user.setLogin(dao.getUserName());
