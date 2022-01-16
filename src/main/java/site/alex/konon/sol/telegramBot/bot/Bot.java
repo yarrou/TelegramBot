@@ -14,6 +14,7 @@ import site.alex.konon.sol.telegramBot.constants.*;
 import site.alex.konon.sol.telegramBot.controller.CityController;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
+import site.alex.konon.sol.telegramBot.services.LocaleService;
 
 import java.util.ArrayList;
 
@@ -24,10 +25,13 @@ public class Bot extends TelegramLongPollingBot {
     private String botUsername;
     @Value("${bot.token}")
     private String botToken;
+
     @Autowired
     CityRepository repository;
+    @Autowired
+    LocaleService localeService;
 
-    ConstantsLocalization localization; //= new ConstantsEng();
+    ConstantsLocalization localization;
 
     @Override
     public String getBotUsername() {
@@ -90,18 +94,6 @@ public class Bot extends TelegramLongPollingBot {
     }
     private void setLocalization(Message message){
         String locale = message.getFrom().getLanguageCode();
-        switch (locale){
-            case ("ru"):
-                localization=new ConstantsRu();
-                break;
-            case ("de"):
-                localization = new ConstantsDe();
-                break;
-            case ("be"):
-                localization = new ConstantsBy();
-                break;
-            default:
-                localization = new ConstantsEng();
-        }
+        localization = localeService.getLocale(locale);
     }
 }
