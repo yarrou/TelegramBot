@@ -27,4 +27,16 @@ public class ConstantsDe extends ConstantsLocalization{
     public String getClarify() {
         return "aktualisieren Sie bitte den Antrag.";
     }
+
+    @Override
+    public String getRegistrationEmailText() {
+        return "Sehr geehrter Benutzer,<br>"
+                + "Sie haben sich registriert, um die Datenbank des Telegrammbots [[bot]] zu verwalten<br>"
+                + "Dank";
+    }
+
+    @Override
+    public String getRegistrationSubjectText() {
+        return "Anmeldung für den ";
+    }
 }

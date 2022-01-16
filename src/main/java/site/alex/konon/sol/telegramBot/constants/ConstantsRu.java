@@ -26,4 +26,17 @@ public class ConstantsRu extends ConstantsLocalization {
     public String getClarify() {
         return "пожалуйста уточните запрос.";
     }
+
+    @Override
+    public String getRegistrationEmailText() {
+        return "Уважаемый пользователь,<br>"
+                + "Вы зарегистрировались для управления базой данных Телеграм бота [[bot]]<br>"
+                + "Спасибо";
+    }
+
+    @Override
+    public String getRegistrationSubjectText() {
+        return "Регистрация на ";
+    }
+
 }
