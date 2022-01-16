@@ -4,6 +4,7 @@ import site.alex.konon.sol.telegramBot.dao.UserForm;
 import site.alex.konon.sol.telegramBot.entity.User;
 
 public interface UserService {
+    void setLocale(String locale);
     User register(UserForm userForm);
     User getUserById(long id);
     boolean isAdmin(User user);
