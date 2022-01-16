@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     public User register(UserForm userForm) {
         User user = convertUserForm(userForm);
         if(getUserByLogin(user.getLogin()).getId()==0){
+            user.setRegistrationToken(tokenService.getRandom());
             user.setToken(tokenService.generateAuthToken(user.getLogin()));
             emailSenderService.sendRegistrationEmail(user,locale);
             return save(user);
