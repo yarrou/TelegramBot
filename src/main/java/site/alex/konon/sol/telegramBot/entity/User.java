@@ -26,6 +26,9 @@ public class User implements Serializable {
 
     @Column(name = "token")
     private String token;
+    @Column(name = "registration_token")
+    private String registrationToken;
+
     @Column(name = "isConfirm")
     private boolean isConfirm = false;
     private Timestamp dateExpire;
