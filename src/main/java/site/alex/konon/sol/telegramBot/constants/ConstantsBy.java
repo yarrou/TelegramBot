@@ -25,4 +25,15 @@ public class ConstantsBy extends ConstantsLocalization{
     public String getClarify() {
         return "калі ласка удакладніце запыт.";
     }
+    @Override
+    public String getRegistrationEmailText() {
+        return "Паважаны карыстальнік,<br>"
+                + "Вы зарэгістраваліся для кіравання базай дадзеных Телеграм бота [[bot]]<br>"
+                + "Дзякуй";
+    }
+
+    @Override
+    public String getRegistrationSubjectText() {
+        return "Регістрацыя на ";
+    }
 }

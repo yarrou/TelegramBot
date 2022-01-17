@@ -25,4 +25,16 @@ public class ConstantsEng extends ConstantsLocalization {
     public String getClarify() {
         return "please specify the request.";
     }
+
+    @Override
+    public String getRegistrationEmailText() {
+        return "Dear user,<br>"
+                + "You have registered to manage the Telegram bot database [[bot]]<br>"
+                + "Thank you";
+    }
+
+    @Override
+    public String getRegistrationSubjectText() {
+        return "Registration for the bot";
+    }
 }

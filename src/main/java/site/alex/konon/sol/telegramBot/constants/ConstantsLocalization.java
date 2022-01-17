@@ -6,4 +6,6 @@ public abstract class ConstantsLocalization {
     public abstract String getSuggestion();
     public abstract String getList();
     public abstract String getClarify();
+    public abstract String getRegistrationEmailText();
+    public abstract String getRegistrationSubjectText();
 }

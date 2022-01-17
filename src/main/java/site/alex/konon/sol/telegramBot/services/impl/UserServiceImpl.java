@@ -5,6 +5,7 @@ import site.alex.konon.sol.telegramBot.dao.UserForm;
 import site.alex.konon.sol.telegramBot.entity.User;
 import site.alex.konon.sol.telegramBot.mapper.UserMapper;
 import site.alex.konon.sol.telegramBot.repository.UserRepository;
+import site.alex.konon.sol.telegramBot.services.EmailSenderService;
 import site.alex.konon.sol.telegramBot.services.TokenService;
 import site.alex.konon.sol.telegramBot.services.UserService;
 
@@ -13,20 +14,30 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final TokenService tokenService;
+    private final EmailSenderService emailSenderService;
+    private String locale;
+
+    public void setLocale(String locale){
+        this.locale = locale;
+    }
 
 
 
-    public UserServiceImpl(UserMapper userMapper, UserRepository userRepository, TokenService tokenService) {
+    public UserServiceImpl(UserMapper userMapper, UserRepository userRepository, TokenService tokenService, EmailSenderService emailSenderService) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
         this.tokenService = tokenService;
+        this.emailSenderService = emailSenderService;
+        this.locale = "en";
     }
 
     @Override
     public User register(UserForm userForm) {
         User user = convertUserForm(userForm);
         if(getUserByLogin(user.getLogin()).getId()==0){
+            user.setRegistrationToken(tokenService.getRandom());
             user.setToken(tokenService.generateAuthToken(user.getLogin()));
+            emailSenderService.sendRegistrationEmail(user,locale);
             return save(user);
         }
         else {
