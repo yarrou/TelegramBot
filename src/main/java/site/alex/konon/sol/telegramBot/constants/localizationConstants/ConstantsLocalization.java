@@ -1,4 +1,4 @@
-package site.alex.konon.sol.telegramBot.constants;
+package site.alex.konon.sol.telegramBot.constants.localizationConstants;
 
 public abstract class ConstantsLocalization {
     public abstract String getUnknown();

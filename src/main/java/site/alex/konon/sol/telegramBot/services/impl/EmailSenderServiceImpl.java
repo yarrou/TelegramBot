@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import site.alex.konon.sol.telegramBot.constants.ConstantsLocalization;
+import site.alex.konon.sol.telegramBot.constants.localizationConstants.ConstantsLocalization;
 import site.alex.konon.sol.telegramBot.emailSender.EmailSender;
 import site.alex.konon.sol.telegramBot.entity.User;
 import site.alex.konon.sol.telegramBot.services.EmailSenderService;

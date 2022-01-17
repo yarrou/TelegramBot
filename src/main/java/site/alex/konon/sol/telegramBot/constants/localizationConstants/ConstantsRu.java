@@ -1,4 +1,4 @@
-package site.alex.konon.sol.telegramBot.constants;
+package site.alex.konon.sol.telegramBot.constants.localizationConstants;
 
 public class ConstantsRu extends ConstantsLocalization {
 

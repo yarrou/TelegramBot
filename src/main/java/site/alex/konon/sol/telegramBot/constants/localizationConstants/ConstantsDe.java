@@ -1,6 +1,6 @@
-package site.alex.konon.sol.telegramBot.constants;
+package site.alex.konon.sol.telegramBot.constants.localizationConstants;
 
-public class ConstantsDe extends ConstantsLocalization{
+public class ConstantsDe extends ConstantsLocalization {
     @Override
     public String getUnknown() {
         return "Wir wissen nichts über diese Stadt.";
