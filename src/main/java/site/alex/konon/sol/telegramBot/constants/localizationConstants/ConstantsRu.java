@@ -30,13 +30,48 @@ public class ConstantsRu extends ConstantsLocalization {
     @Override
     public String getRegistrationEmailText() {
         return "Уважаемый пользователь,<br>"
-                + "Вы зарегистрировались для управления базой данных Телеграм бота [[bot]]<br>"
+                + "Вы подтвердили регистрацию аккаунта для управления базой данных Телеграм бота [[bot]]<br>"
                 + "Спасибо";
     }
 
     @Override
     public String getRegistrationSubjectText() {
         return "Регистрация на ";
+    }
+
+    @Override
+    public String getConfirmRegistrationEmailText() {
+        return "Уважаемый пользователь,<br>"
+                + "Вы регистрируете новый аккаунт для управления базой данных Телеграм бота [[bot]]<br>"
+                + "Пожалуйста, пройдите по ссылке для подтверждения регистрации<br>"
+                +"[[url]] <br>"
+                + "Спасибо,<br>"
+                + "[[bot]]";
+    }
+
+    @Override
+    public String getConfirmRegistrationSubjectText() {
+        return "Подтвердите регистрацию";
+    }
+
+    @Override
+    public String getSuccessConfirmRegistrationMessage() {
+        return "Вы успешно подтвердили регистрацию";
+    }
+
+    @Override
+    public String getAlreadyConfirmRegistrationMessage() {
+        return "Регистрация уже была подтверждена, повторять это действие не требуется";
+    }
+
+    @Override
+    public String getBadConfirmRegistrationTokenMessage() {
+        return "Неправильный код подтверждения";
+    }
+
+    @Override
+    public String getSomeoneWrongMessage() {
+        return "что то пошло не так...";
     }
 
 }

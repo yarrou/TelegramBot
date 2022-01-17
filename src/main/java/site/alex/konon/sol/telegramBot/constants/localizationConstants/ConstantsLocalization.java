@@ -8,4 +8,10 @@ public abstract class ConstantsLocalization {
     public abstract String getClarify();
     public abstract String getRegistrationEmailText();
     public abstract String getRegistrationSubjectText();
+    public abstract String getConfirmRegistrationEmailText();
+    public abstract String getConfirmRegistrationSubjectText();
+    public abstract String getSuccessConfirmRegistrationMessage();
+    public abstract String getAlreadyConfirmRegistrationMessage();
+    public abstract String getBadConfirmRegistrationTokenMessage();
+    public abstract String getSomeoneWrongMessage();
 }
