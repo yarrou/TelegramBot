@@ -1,5 +1,6 @@
 package site.alex.konon.sol.telegramBot.services;
 
+import org.springframework.http.ResponseEntity;
 import site.alex.konon.sol.telegramBot.dao.UserForm;
 import site.alex.konon.sol.telegramBot.entity.User;
 
@@ -13,4 +14,5 @@ public interface UserService {
     User getUserFromRequest(UserForm userForm);
     User convertUserForm(UserForm userForm);
     String loginUser(User user);
+    ResponseEntity confirmRegister(String code);
 }
