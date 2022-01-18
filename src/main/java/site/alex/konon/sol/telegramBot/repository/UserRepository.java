@@ -10,4 +10,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("from User u where lower(u.login)=lower(:login)")
     Optional<User> findOneByLogin(@Param("login") String login);
+
+    @Query("from User u where u.registrationToken = :code")
+    Optional<User> findOneByRegistrationToken(@Param("code") String code);
 }
