@@ -30,6 +30,7 @@ public class MessagesSourcesServiceImpl implements MessagesSourcesService {
             case ("ru"):
                 return new Locale("ru");
             case ("by"):
+            case ("be"):
                 return new Locale("by");
             case ("de"):
                 return Locale.GERMAN;
