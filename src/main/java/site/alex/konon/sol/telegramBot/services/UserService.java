@@ -15,4 +15,5 @@ public interface UserService {
     User convertUserForm(UserForm userForm);
     String loginUser(User user);
     ResponseEntity confirmRegister(String code);
+    User getUserByToken(String token);
 }

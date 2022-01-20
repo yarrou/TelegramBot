@@ -71,6 +71,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByToken(String token) {
+        return userRepository.findOneByToken(token).orElseGet(User::new);
+    }
+
+    @Override
     public User getUserById(long id) {
         return userRepository.getOne(id);
     }
