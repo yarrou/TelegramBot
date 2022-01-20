@@ -10,11 +10,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import site.alex.konon.sol.telegramBot.constants.*;
-import site.alex.konon.sol.telegramBot.controller.CityController;
+import site.alex.konon.sol.telegramBot.constants.localizationConstants.ConstantsLocalization;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import site.alex.konon.sol.telegramBot.services.LocaleService;
+import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
 import java.util.ArrayList;
 
@@ -25,13 +25,13 @@ public class Bot extends TelegramLongPollingBot {
     private String botUsername;
     @Value("${bot.token}")
     private String botToken;
+    private Message message;
 
     @Autowired
     CityRepository repository;
     @Autowired
-    LocaleService localeService;
+    MessagesSourcesService messagesSourcesService;
 
-    ConstantsLocalization localization;
 
     @Override
     public String getBotUsername() {
@@ -58,33 +58,33 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Message message = update.getMessage();
-        setLocalization(message);
+        message = update.getMessage();
         String nameUser = message.getFrom().getUserName();
+        String lang = getUserLang(message);
         String signatureUser = message.getFrom().toString();
         logger.info("new message from {} : {}",nameUser,signatureUser);
         if (message != null && message.hasText()) {
             String cityName = message.getText();
             logger.info("message is {}",cityName);
-            String answer = localization.getUnknown();
+            String answer = messagesSourcesService.getStringValue(MessagesSourcesService.UNKNOWN_CITY,lang);
 
             ArrayList<City> cities = repository.findByNameStartingWith(cityName);
             if (cityName.equals("/start")) {
-                answer = localization.getGreeting();
+                answer = messagesSourcesService.getStringValue(MessagesSourcesService.GREETING_CITY,lang);
             } else if (!cities.isEmpty()) {
                 if (cities.size() == 1) {
                     City requiredCity = cities.get(0);
                     if (cityName.equals(requiredCity.getName())) {
                         answer = requiredCity.getText();
                     } else {
-                        answer = localization.getSuggestion() + requiredCity.getName() + " : " + requiredCity.getText();
+                        answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY,lang) + requiredCity.getName() + " : " + requiredCity.getText();
                     }
                 } else {
-                    StringBuilder builder = new StringBuilder(localization.getList());
+                    StringBuilder builder = new StringBuilder(messagesSourcesService.getStringValue(MessagesSourcesService.LIST_CITY,lang));
                     for (City city : cities) {
                         builder.append(city.getName() + ",");
                     }
-                    builder.append(localization.getClarify());
+                    builder.append(messagesSourcesService.getStringValue(MessagesSourcesService.CLARIFY_CITY,lang));
                     answer = builder.toString();
                 }
             }
@@ -92,8 +92,8 @@ public class Bot extends TelegramLongPollingBot {
             sendMsg(message, answer);
         }
     }
-    private void setLocalization(Message message){
-        String locale = message.getFrom().getLanguageCode();
-        localization = localeService.getLocale(locale);
+
+    private String getUserLang(Message message){
+        return message.getFrom().getLanguageCode();
     }
 }

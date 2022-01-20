@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import site.alex.konon.sol.telegramBot.entity.City;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import site.alex.konon.sol.telegramBot.entity.User;
 import site.alex.konon.sol.telegramBot.services.CityService;
+import site.alex.konon.sol.telegramBot.services.UserService;
 import site.alex.konon.sol.telegramBot.validator.CityValidator;
 import site.alex.konon.sol.telegramBot.validator.TextValidator;
 
@@ -18,15 +20,21 @@ public class CityController {
 
     private static final Logger logger = LoggerFactory.getLogger(CityController.class);
     private final CityService cityService;
+    private final UserService userService;
 
-    public CityController(final CityService cityService) {
+    public CityController(final CityService cityService, UserService userService) {
         this.cityService = cityService;
+        this.userService = userService;
     }
 
 
     @PostMapping("/city")
-    public ResponseEntity addNewCity(@RequestBody City city, HttpServletRequest request) {
+    public ResponseEntity addNewCity(@RequestBody City city, HttpServletRequest request,@RequestHeader("auth-token") String token) {
         logger.info("new post connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
+        User user = userService.getUserByToken(token);
+        if (user.getId()==0&&!user.isConfirm()){
+            return new ResponseEntity("no authority",HttpStatus.UNAUTHORIZED);
+        }
         if(!CityValidator.cityValidate(city)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
@@ -38,8 +46,12 @@ public class CityController {
     }
 
     @DeleteMapping("/city")
-    public ResponseEntity deleteCity(@RequestParam(value = "city") String name,HttpServletRequest request) {
+    public ResponseEntity deleteCity(@RequestParam(value = "city") String name,HttpServletRequest request,@RequestHeader("auth-token") String token) {
         logger.info("new del connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
+        User user = userService.getUserByToken(token);
+        if (user.getId()==0&&!user.isConfirm()){
+            return new ResponseEntity("no authority",HttpStatus.UNAUTHORIZED);
+        }
         if (!TextValidator.noEmptyValidate(name)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
@@ -51,8 +63,12 @@ public class CityController {
     }
 
     @PutMapping("/city")
-    public ResponseEntity updateCity(@RequestBody City city,HttpServletRequest request) {
+    public ResponseEntity updateCity(@RequestBody City city,HttpServletRequest request,@RequestHeader("auth-token") String token) {
         logger.info("new put connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
+        User user = userService.getUserByToken(token);
+        if (user.getId()==0&&!user.isConfirm()){
+            return new ResponseEntity("no authority",HttpStatus.UNAUTHORIZED);
+        }
         if (!CityValidator.cityValidate(city)){
             return new ResponseEntity("not valid",HttpStatus.BAD_REQUEST);
         }
@@ -85,5 +101,7 @@ public class CityController {
             return new ResponseEntity(cities,HttpStatus.OK);
         }else return new ResponseEntity(cities,HttpStatus.NOT_FOUND);
     }
+
+
 
 }
