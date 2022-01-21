@@ -8,6 +8,7 @@ import site.alex.konon.sol.telegramBot.entity.User;
 import site.alex.konon.sol.telegramBot.mapper.UserMapper;
 import site.alex.konon.sol.telegramBot.repository.UserRepository;
 import site.alex.konon.sol.telegramBot.services.EmailSenderService;
+import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 import site.alex.konon.sol.telegramBot.services.TokenService;
 import site.alex.konon.sol.telegramBot.services.UserService;
 
@@ -17,6 +18,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final EmailSenderService emailSenderService;
+    private final MessagesSourcesService messagesSourcesService;
     private String locale;
 
     public void setLocale(String locale){
@@ -24,11 +26,16 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public UserServiceImpl(UserMapper userMapper, UserRepository userRepository, TokenService tokenService, EmailSenderService emailSenderService) {
+    public UserServiceImpl(UserMapper userMapper,
+                           UserRepository userRepository,
+                           TokenService tokenService,
+                           EmailSenderService emailSenderService,
+                           MessagesSourcesService messagesSourcesService) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.emailSenderService = emailSenderService;
+        this.messagesSourcesService = messagesSourcesService;
         this.locale = "en";
     }
 
@@ -41,7 +48,7 @@ public class UserServiceImpl implements UserService {
             emailSenderService.sendConfirmRegistrationEmail(user, locale);
             return save(user);
         } else {
-            throw new IllegalArgumentException("user with this username already exists");
+            throw new IllegalArgumentException(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_USER_ALREADY_EXISTS));
         }
     }
 
@@ -60,14 +67,14 @@ public class UserServiceImpl implements UserService {
             user.setConfirm(true);
             save(user);
             emailSenderService.sendSuccessRegistrationEmail(user,locale);
-            return new ResponseEntity("вы успешно подтвердили регистрацию", HttpStatus.OK);
+            return new ResponseEntity(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_SUCCESS_CONFIRM_REGISTRATION), HttpStatus.OK);
         } else if (user.isConfirm()){
-            return new ResponseEntity("регистрация уже подтверждена",HttpStatus.OK);
+            return new ResponseEntity(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_ALREADY_CONFIRM_REGISTRATION),HttpStatus.OK);
          }
          else if (user.getId()==0){
-             return new ResponseEntity("неправильный токен",HttpStatus.OK);
+             return new ResponseEntity(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_BAD_CONFIRM_REGISTRATION_TOKEN),HttpStatus.OK);
          }
-         else return new ResponseEntity("что то пошло не так",HttpStatus.NOT_ACCEPTABLE);
+         else return new ResponseEntity(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_SOMEONE_WRONG),HttpStatus.NOT_ACCEPTABLE);
     }
 
     @Override
