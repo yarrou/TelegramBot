@@ -32,7 +32,8 @@ public class CityController {
 
 
     @PostMapping("/city")
-    public ResponseEntity addNewCity(@RequestBody City city, HttpServletRequest request,@RequestHeader("auth-token") String token) {
+    public ResponseEntity addNewCity(@RequestBody City city, HttpServletRequest request,@RequestHeader("auth-token") String token,
+                                     @RequestParam(name = "lang",required = false) String lang) {
         logger.info("new post connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
         User user = userService.getUserByToken(token);
         if (user.getId()==0&&!user.isConfirm()){
@@ -49,7 +50,8 @@ public class CityController {
     }
 
     @DeleteMapping("/city")
-    public ResponseEntity deleteCity(@RequestParam(value = "city") String name,HttpServletRequest request,@RequestHeader("auth-token") String token) {
+    public ResponseEntity deleteCity(@RequestParam(value = "city") String name,HttpServletRequest request,@RequestHeader("auth-token") String token,
+            @RequestParam(name = "lang",required = false) String lang) {
         logger.info("new del connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
         User user = userService.getUserByToken(token);
         if (user.getId()==0&&!user.isConfirm()){
@@ -66,7 +68,8 @@ public class CityController {
     }
 
     @PutMapping("/city")
-    public ResponseEntity updateCity(@RequestBody City city,HttpServletRequest request,@RequestHeader("auth-token") String token) {
+    public ResponseEntity updateCity(@RequestBody City city,HttpServletRequest request,@RequestHeader("auth-token") String token,
+                                     @RequestParam(name = "lang",required = false) String lang) {
         logger.info("new put connect from ip {} , and city name is {}",request.getRemoteAddr(),city.getName());
         User user = userService.getUserByToken(token);
         if (user.getId()==0&&!user.isConfirm()){
@@ -83,7 +86,8 @@ public class CityController {
     }
 
     @GetMapping("/city")
-    public ResponseEntity findCity(@RequestParam(value = "city") String name, HttpServletRequest request) {
+    public ResponseEntity findCity(@RequestParam(value = "city") String name, HttpServletRequest request,
+                                   @RequestParam(name = "lang",required = false) String lang) {
         logger.info("new get connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
         if(!TextValidator.noEmptyValidate(name)){
             return new ResponseEntity(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_NOT_VALID_DATA),HttpStatus.BAD_REQUEST);
@@ -97,14 +101,12 @@ public class CityController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity search(@RequestParam(value = "city") String name, HttpServletRequest request) {
+    public ResponseEntity search(@RequestParam(value = "city") String name, HttpServletRequest request,
+                                 @RequestParam(name = "lang",required = false) String lang) {
         logger.info("new find connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
         List<City> cities = cityService.findCity(name);
         if (cities.size()>0){
             return new ResponseEntity(cities,HttpStatus.OK);
         }else return new ResponseEntity(cities,HttpStatus.NOT_FOUND);
     }
-
-
-
 }
