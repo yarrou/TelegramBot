@@ -18,6 +18,13 @@ public interface MessagesSourcesService {
     public static final String MESSAGE_ALREADY_EXISTS = "message.already.exists";
     public static final String MESSAGE_SOMEONE_WRONG = "message.someone.wrong";
     public static final String MESSAGE_USER_ALREADY_EXISTS = "message.user.already.exists";
+    public static final String MESSAGE_NOT_PRIVILEGES = "message.not.privileges";
+    public static final String MESSAGE_NOT_VALID_DATA = "message.not.valid.data";
+    public static final String MESSAGE_SUCCESSFULLY_ADDED =  "message.successfully.added";
+    public static final String MESSAGE_DATA_DELETED = "message.data.deleted";
+    public static final String MESSAGE_NOT_FOUND = "message.not.found";
+    public static final String MESSAGE_DATA_CHANGED = "message.data.changed";
+
     public String getStringValue(String value);
     public String getStringValue(String value,String lang);
 }
