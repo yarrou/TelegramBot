@@ -10,10 +10,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import site.alex.konon.sol.telegramBot.constants.localizationConstants.ConstantsLocalization;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
-import site.alex.konon.sol.telegramBot.services.LocaleService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
 import java.util.ArrayList;
