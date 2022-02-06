@@ -1,34 +1,42 @@
 package site.alex.konon.sol.telegramBot.bot;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
+import java.io.File;
 import java.util.ArrayList;
 
+@Slf4j
 @Component
 public class Bot extends TelegramLongPollingBot {
-    private static final Logger logger = LoggerFactory.getLogger(Bot.class);
     @Value("${bot.name}")
     private String botUsername;
     @Value("${bot.token}")
     private String botToken;
     private Message message;
+    @Value("${path.app}")
+    private String pathToApp;
 
-    @Autowired
-    CityRepository repository;
-    @Autowired
-    MessagesSourcesService messagesSourcesService;
+
+
+    private final CityRepository repository;
+    private final MessagesSourcesService messagesSourcesService;
+    public Bot(CityRepository repository, MessagesSourcesService messagesSourcesService) {
+        this.repository = repository;
+        this.messagesSourcesService = messagesSourcesService;
+    }
 
 
     @Override
@@ -60,38 +68,62 @@ public class Bot extends TelegramLongPollingBot {
         String nameUser = message.getFrom().getUserName();
         String lang = getUserLang(message);
         String signatureUser = message.getFrom().toString();
-        logger.info("new message from {} : {}",nameUser,signatureUser);
+        log.info("new message from {} : {}", nameUser, signatureUser);
         if (message != null && message.hasText()) {
             String cityName = message.getText();
-            logger.info("message is {}",cityName);
-            String answer = messagesSourcesService.getStringValue(MessagesSourcesService.UNKNOWN_CITY,lang);
+            log.info("message is {}", cityName);
+            String answer = messagesSourcesService.getStringValue(MessagesSourcesService.UNKNOWN_CITY, lang);
 
             ArrayList<City> cities = repository.findByNameStartingWith(cityName);
-            if (cityName.equals("/start")) {
-                answer = messagesSourcesService.getStringValue(MessagesSourcesService.GREETING_CITY,lang);
-            } else if (!cities.isEmpty()) {
-                if (cities.size() == 1) {
-                    City requiredCity = cities.get(0);
-                    if (cityName.equals(requiredCity.getName())) {
-                        answer = requiredCity.getText();
-                    } else {
-                        answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY,lang) + requiredCity.getName() + " : " + requiredCity.getText();
+            switch (cityName) {
+                case ("/start"):
+                    answer = messagesSourcesService.getStringValue(MessagesSourcesService.GREETING_CITY, lang);
+                    sendMsg(message, answer);
+                    break;
+                case ("/download_app"):
+                    sendUploadingAFile(message);
+                    break;
+                case ("/info"):
+                    answer = messagesSourcesService.getStringValue(MessagesSourcesService.ABOUT_BOT, lang);
+                    sendMsg(message, answer);
+                    break;
+                default:
+                    if (!cities.isEmpty()) {
+                        if (cities.size() == 1) {
+                            City requiredCity = cities.get(0);
+                            if (cityName.equals(requiredCity.getName())) {
+                                answer = requiredCity.getText();
+                            } else {
+                                answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY, lang) + requiredCity.getName() + " : " + requiredCity.getText();
+                            }
+                        } else {
+                            StringBuilder builder = new StringBuilder(messagesSourcesService.getStringValue(MessagesSourcesService.LIST_CITY, lang));
+                            for (City city : cities) {
+                                builder.append(city.getName() + ",");
+                            }
+                            builder.append(messagesSourcesService.getStringValue(MessagesSourcesService.CLARIFY_CITY, lang));
+                            answer = builder.toString();
+                        }
                     }
-                } else {
-                    StringBuilder builder = new StringBuilder(messagesSourcesService.getStringValue(MessagesSourcesService.LIST_CITY,lang));
-                    for (City city : cities) {
-                        builder.append(city.getName() + ",");
-                    }
-                    builder.append(messagesSourcesService.getStringValue(MessagesSourcesService.CLARIFY_CITY,lang));
-                    answer = builder.toString();
-                }
+                    sendMsg(message, answer);
             }
-
-            sendMsg(message, answer);
         }
     }
 
-    private String getUserLang(Message message){
+    private String getUserLang(Message message) {
         return message.getFrom().getLanguageCode();
     }
+
+    public void sendUploadingAFile(Message message) {
+        SendDocument sendDockRequest = new SendDocument();
+        sendDockRequest.setChatId(message.getChatId().toString());
+        sendDockRequest.setDocument(new InputFile(new File(pathToApp)));
+        try {
+            execute(sendDockRequest);
+        } catch (TelegramApiException e) {
+            log.error("failed to upload the application file", e);
+            e.printStackTrace();
+        }
+    }
+
 }
