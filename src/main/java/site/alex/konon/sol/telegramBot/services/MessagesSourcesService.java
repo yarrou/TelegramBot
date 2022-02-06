@@ -24,6 +24,7 @@ public interface MessagesSourcesService {
     public static final String MESSAGE_DATA_DELETED = "message.data.deleted";
     public static final String MESSAGE_NOT_FOUND = "message.not.found";
     public static final String MESSAGE_DATA_CHANGED = "message.data.changed";
+    public static final String ABOUT_BOT = "bot.about";
 
     public String getStringValue(String value);
     public String getStringValue(String value,String lang);
