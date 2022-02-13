@@ -28,9 +28,6 @@ public class Bot extends TelegramLongPollingBot {
     private Message message;
     @Value("${path.app}")
     private String pathToApp;
-
-
-
     private final CityRepository repository;
     private final MessagesSourcesService messagesSourcesService;
     public Bot(CityRepository repository, MessagesSourcesService messagesSourcesService) {
