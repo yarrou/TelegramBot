@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
+import site.alex.konon.sol.telegramBot.services.AppFileService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
 import java.io.File;
@@ -26,11 +27,11 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
     private Message message;
-    @Value("${path.app}")
-    private String pathToApp;
+    private final AppFileService appFileService;
     private final CityRepository repository;
     private final MessagesSourcesService messagesSourcesService;
-    public Bot(CityRepository repository, MessagesSourcesService messagesSourcesService) {
+    public Bot(AppFileService appFileService, CityRepository repository, MessagesSourcesService messagesSourcesService) {
+        this.appFileService = appFileService;
         this.repository = repository;
         this.messagesSourcesService = messagesSourcesService;
     }
@@ -114,7 +115,7 @@ public class Bot extends TelegramLongPollingBot {
     public void sendUploadingAFile(Message message) {
         SendDocument sendDockRequest = new SendDocument();
         sendDockRequest.setChatId(message.getChatId().toString());
-        sendDockRequest.setDocument(new InputFile(new File(pathToApp)));
+        sendDockRequest.setDocument(new InputFile(appFileService.getAppFile()));
         try {
             execute(sendDockRequest);
         } catch (TelegramApiException e) {
