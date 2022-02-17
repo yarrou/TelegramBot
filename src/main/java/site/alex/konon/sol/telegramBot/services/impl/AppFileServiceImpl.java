@@ -24,11 +24,11 @@ public class AppFileServiceImpl implements AppFileService {
         try (Stream<Path> walk = Files.walk(Paths.get(pathDir))) {
             List<File> result = walk.map(x -> x.toFile())
                     .filter(f -> f.getName().endsWith(".apk"))
-                    .filter(f->f.getName().startsWith("ControllerForTelegramBot "))
+                    .filter(f -> f.getName().startsWith("ControllerForTelegramBot "))
                     .collect(Collectors.toList());
             if (result.size()==0){
                 throw new IllegalArgumentException("not found app file");
-            }else if (result.size()>1){
+            }if (result.size()>1){
                 throw new IllegalArgumentException("too many files found");
             }app = result.get(0);
         } catch (IOException e) {
@@ -36,6 +36,8 @@ public class AppFileServiceImpl implements AppFileService {
         }
         return app;
     }
+
+    //the file name should be in the format : ControllerForTelegramBot v-X.X.X-debug.apk
     @Override
     public String getVersionValue(){
         File app = getAppFile();
