@@ -24,7 +24,7 @@ public class AppFileController {
     }
     @GetMapping(Endpoints.IS_UPDATE)
     public ResponseEntity isUpdate(@RequestParam(value = "version") String remoteVersion){
-        return appFileService.isNewVersion(remoteVersion)?new ResponseEntity("a new version " + appFileService.getVersionValue() + "is available", HttpStatus.OK):
+        return appFileService.isNewVersion(remoteVersion)?new ResponseEntity(appFileService.getVersionValue(), HttpStatus.OK):
                 new ResponseEntity("no updates found",HttpStatus.NOT_FOUND);
     }
     @GetMapping(Endpoints.DOWNLOAD_APP)
