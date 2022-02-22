@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -16,7 +18,6 @@ import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import site.alex.konon.sol.telegramBot.services.AppFileService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
-import java.io.File;
 import java.util.ArrayList;
 
 @Slf4j
@@ -115,8 +116,12 @@ public class Bot extends TelegramLongPollingBot {
     public void sendUploadingAFile(Message message) {
         SendDocument sendDockRequest = new SendDocument();
         sendDockRequest.setChatId(message.getChatId().toString());
+        SendChatAction sendChatAction = new SendChatAction();
+        sendChatAction.setChatId(message.getChatId().toString());
+        sendChatAction.setAction(ActionType.UPLOADDOCUMENT);
         sendDockRequest.setDocument(new InputFile(appFileService.getAppFile()));
         try {
+            execute(sendChatAction);
             execute(sendDockRequest);
         } catch (TelegramApiException e) {
             log.error("failed to upload the application file", e);
