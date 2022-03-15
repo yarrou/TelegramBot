@@ -94,7 +94,7 @@ public class CityController {
         }
         City city = cityService.getCityByName(name);
         if (city != null) {
-            return new ResponseEntity(city.getText(), HttpStatus.OK);
+            return new ResponseEntity(city, HttpStatus.OK);
         } else {
             return new ResponseEntity(messagesSourcesService.getStringValue(MessagesSourcesService.MESSAGE_NOT_FOUND),HttpStatus.NOT_FOUND);
         }
