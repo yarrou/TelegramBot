@@ -24,14 +24,14 @@ public class CityServiceImpl implements CityService {
     @Override
     public City getCityByName(String name) {
         City city = repository.findByName(name);
-        city.setPicture(service.getImage(city));
+        city.setPicture(service.getImageAsString(city));
         return city;
     }
 
     @Override
     public List<City> findCity(String name) {
         List<City> cities = repository.findByNameStartingWith(name);
-        return cities.stream().peek(x -> x.setPicture(service.getImage(x))).collect(Collectors.toList());
+        return cities.stream().peek(x -> x.setPicture(service.getImageAsString(x))).collect(Collectors.toList());
     }
 
     @Override
@@ -39,7 +39,7 @@ public class CityServiceImpl implements CityService {
         if (!repository.existsByName(city.getName())) {
             city.setDateCreated(new Timestamp(new Date().getTime()));
             city.setDateLastModification(new Timestamp(0));
-            service.writeImage(city);
+            service.writeImageFromString(city);
             repository.save(city);
             return true;
         } else return false;
@@ -51,7 +51,7 @@ public class CityServiceImpl implements CityService {
         if (town != null) {
             town.setText(city.getText());
             town.setDateLastModification(new Timestamp(new Date().getTime()));
-            service.writeImage(city);
+            service.writeImageFromString(city);
             repository.save(town);
             return true;
         } else return false;
