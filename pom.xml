@@ -11,7 +11,7 @@
 
     <groupId>site.alex.konon.sol</groupId>
     <artifactId>telegramBot</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
+    <version>0.7.3-SNAPSHOT</version>
     <name>telegramBot</name>
     <description>telegram bot</description>
 
@@ -93,6 +93,13 @@
             <artifactId>java-jwt</artifactId>
             <version>3.18.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
+
     </dependencies>
 
     <build>
