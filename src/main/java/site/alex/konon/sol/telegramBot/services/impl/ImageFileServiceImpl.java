@@ -49,13 +49,9 @@ public class ImageFileServiceImpl implements ImageFileService {
             return resultStringBuilder.toString();
         } catch (FileNotFoundException e) {
             try {
-                File file = new File(getClass().getClassLoader().getResource("static/images/city.png").getFile());
-                FileInputStream imageInFile = new FileInputStream(file);
-                byte imageData[] = new byte[(int) file.length()];
-                imageInFile.read(imageData);
+                byte imageData[]  = getClass().getClassLoader().getResourceAsStream("static/images/city.png").readAllBytes();
                 String imageDataString = encodeImage(imageData);
                 city.setPicture(imageDataString);
-                //writeImageFromString(city);
                 return imageDataString;
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -66,7 +62,7 @@ public class ImageFileServiceImpl implements ImageFileService {
         }
     }
     private String encodeImage(byte[] imageByteArray) {
-        return Base64.encodeBase64String(imageByteArray);//.encodeBase64URLSafeString(imageByteArray);
+        return Base64.encodeBase64String(imageByteArray);
     }
 
     private byte[] decodeImage(String imageDataString) {
