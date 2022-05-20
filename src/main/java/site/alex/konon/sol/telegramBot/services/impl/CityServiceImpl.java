@@ -22,6 +22,13 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    public List<String> findCities(String name) {
+        List<City> cities = repository.findByNameStartingWith(name);
+        List<String> names = cities.stream().map(City::getName).collect(Collectors.toList());
+        return names;
+    }
+
+    @Override
     public City getCityByName(String name) {
         City city = repository.findByName(name);
         city.setPicture(service.getImageAsString(city));

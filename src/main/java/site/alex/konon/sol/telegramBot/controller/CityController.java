@@ -104,7 +104,7 @@ public class CityController {
     public ResponseEntity search(@RequestParam(value = "city") String name, HttpServletRequest request,
                                  @RequestParam(name = "lang",required = false) String lang) {
         logger.info("new find connect from ip {} , and city name is {}",request.getRemoteAddr(),name);
-        List<City> cities = cityService.findCity(name);
+        List<String> cities = cityService.findCities(name);
         if (cities.size()>0){
             return new ResponseEntity(cities,HttpStatus.OK);
         }else return new ResponseEntity(cities,HttpStatus.NOT_FOUND);
