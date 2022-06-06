@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import site.alex.konon.sol.telegramBot.services.AppFileService;
+import site.alex.konon.sol.telegramBot.services.ImageFileService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
 import java.util.ArrayList;
@@ -28,11 +29,13 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
     private Message message;
+    private final ImageFileService imageFileService;
     private final AppFileService appFileService;
     private final CityRepository repository;
     private final MessagesSourcesService messagesSourcesService;
-    public Bot(AppFileService appFileService, CityRepository repository, MessagesSourcesService messagesSourcesService) {
+    public Bot(AppFileService appFileService, CityRepository repository, MessagesSourcesService messagesSourcesService, ImageFileService imageFileService) {
         this.appFileService = appFileService;
+        this.imageFileService = imageFileService;
         this.repository = repository;
         this.messagesSourcesService = messagesSourcesService;
     }
