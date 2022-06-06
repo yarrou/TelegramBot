@@ -16,6 +16,7 @@ import java.util.Base64;
 @Service
 public class ImageFileServiceImpl implements ImageFileService {
 
+    //path to the folder with images of cities, set using the environment variable PATH_IMAGES
     @Value("${path.images}")
     private String pathImages;
 
@@ -48,9 +49,9 @@ public class ImageFileServiceImpl implements ImageFileService {
 
     @Override
     public String getImageAsString(City city) {
-        try {
-            File cityImageFile = getImagePath(city);
-            byte[] imageData = new FileInputStream(cityImageFile).readAllBytes();
+        File cityImageFile = getImagePath(city);
+        try (FileInputStream inputStream = new FileInputStream(cityImageFile) ){
+            byte[] imageData = inputStream.readAllBytes();
             return encodeImage(imageData);
         } catch (IOException e) {
             log.error(e.getLocalizedMessage(), e);
@@ -66,7 +67,7 @@ public class ImageFileServiceImpl implements ImageFileService {
             File dirImages = new File(pathImages);
             FileFilter fileFilter = new WildcardFileFilter(searchFileName);
             File[] imagesArray = dirImages.listFiles(fileFilter);
-            if (imagesArray.length == 1) {
+            if (imagesArray != null && imagesArray.length == 1) {
                 cityImageFile = imagesArray[0];
                 return cityImageFile;
             } else throw new FileNotFoundException();
@@ -78,20 +79,26 @@ public class ImageFileServiceImpl implements ImageFileService {
             return cityImageFile;
         }
     }
+    //a method that creates a default city image.
     private void createDefaultCityImageFile(File file){
-        try {
-            byte imageData[] = getClass().getClassLoader().getResourceAsStream("static/images/city.png").readAllBytes();
-            FileUtils.writeByteArrayToFile(file, imageData);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("static/images/city.png")){
+            if(inputStream != null){
+                byte[] imageData = inputStream.readAllBytes();
+                FileUtils.writeByteArrayToFile(file, imageData);
+            }
         } catch (IOException e) {
             log.error(e.getLocalizedMessage(),e);
             throw new RuntimeException(e);
         }
     }
 
+
+    //method returning encoded string from image byte array
     private String encodeImage(byte[] imageByteArray) {
         return Base64.getEncoder().encodeToString(imageByteArray);
     }
 
+    //method returning the decoded image string
     private String decodeImage(String imageDataString) {
         return new String(Base64.getDecoder().decode(imageDataString), StandardCharsets.UTF_8);
     }
