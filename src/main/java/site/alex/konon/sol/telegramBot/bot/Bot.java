@@ -97,6 +97,9 @@ public class Bot extends TelegramLongPollingBot {
                             City requiredCity = cities.get(0);
                             if (cityName.equals(requiredCity.getName())) {
                                 answer = requiredCity.getText();
+                                File cityImageFile = imageFileService.getImagePath(requiredCity);
+                                sendImageUploadingAFile(cityImageFile,message.getChatId().toString(),answer);
+                                break;
                             } else {
                                 answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY, lang) + requiredCity.getName() + " : " + requiredCity.getText();
                             }
