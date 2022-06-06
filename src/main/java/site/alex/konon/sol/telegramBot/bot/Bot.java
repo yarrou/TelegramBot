@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -19,6 +20,7 @@ import site.alex.konon.sol.telegramBot.services.AppFileService;
 import site.alex.konon.sol.telegramBot.services.ImageFileService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
+import java.io.File;
 import java.util.ArrayList;
 
 @Slf4j
@@ -128,6 +130,22 @@ public class Bot extends TelegramLongPollingBot {
             execute(sendDockRequest);
         } catch (TelegramApiException e) {
             log.error("failed to upload the application file", e);
+            e.printStackTrace();
+        }
+    }
+    public void sendImageUploadingAFile(File file, String chatId,String text) {
+        // Create send method
+        SendPhoto sendPhotoRequest = new SendPhoto();
+        // Set destination chat id
+        sendPhotoRequest.setChatId(chatId);
+        // Set the photo file as a new photo (You can also use InputStream with a constructor overload)
+        sendPhotoRequest.setPhoto(new InputFile(file));
+        sendPhotoRequest.setCaption(text);
+        try {
+            // Execute the method
+            execute(sendPhotoRequest);
+        } catch (TelegramApiException e) {
+            log.error(e.getLocalizedMessage(),e);
             e.printStackTrace();
         }
     }
