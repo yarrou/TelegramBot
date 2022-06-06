@@ -49,29 +49,42 @@ public class ImageFileServiceImpl implements ImageFileService {
     @Override
     public String getImageAsString(City city) {
         try {
+            File cityImageFile = getImagePath(city);
+            byte[] imageData = new FileInputStream(cityImageFile).readAllBytes();
+            return encodeImage(imageData);
+        } catch (IOException e) {
+            log.error(e.getLocalizedMessage(), e);
+            return "";
+        }
+    }
+
+    @Override
+    public File getImagePath(City city) {
+        try {
             File cityImageFile;
             String searchFileName = city.getName() + ".*";
             File dirImages = new File(pathImages);
             FileFilter fileFilter = new WildcardFileFilter(searchFileName);
             File[] imagesArray = dirImages.listFiles(fileFilter);
-            if (imagesArray.length == 1){
+            if (imagesArray.length == 1) {
                 cityImageFile = imagesArray[0];
+                return cityImageFile;
             } else throw new FileNotFoundException();
-            byte imageData[] = new FileInputStream(cityImageFile).readAllBytes();
-            return encodeImage(imageData);
         } catch (FileNotFoundException e) {
-            try {
-                byte imageData[] = getClass().getClassLoader().getResourceAsStream("static/images/city.png").readAllBytes();
-                String imageDataString = encodeImage(imageData);
-                city.setPicture(imageDataString);
-                return imageDataString;
-            } catch (IOException ex) {
-                log.error(e.getLocalizedMessage(), e);
-                throw new RuntimeException(ex);
+            File cityImageFile = new File(pathImages + "/city.png");
+            if (!cityImageFile.exists()){
+                createDefaultCityImageFile(cityImageFile);
             }
+            return cityImageFile;
+        }
+    }
+    private void createDefaultCityImageFile(File file){
+        try {
+            byte imageData[] = getClass().getClassLoader().getResourceAsStream("static/images/city.png").readAllBytes();
+            FileUtils.writeByteArrayToFile(file, imageData);
         } catch (IOException e) {
-            log.error(e.getLocalizedMessage(), e);
-            return "";
+            log.error(e.getLocalizedMessage(),e);
+            throw new RuntimeException(e);
         }
     }
 
