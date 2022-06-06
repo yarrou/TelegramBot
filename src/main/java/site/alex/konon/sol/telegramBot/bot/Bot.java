@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,8 +17,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import site.alex.konon.sol.telegramBot.services.AppFileService;
+import site.alex.konon.sol.telegramBot.services.ImageFileService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
+import java.io.File;
 import java.util.ArrayList;
 
 @Slf4j
@@ -28,11 +31,13 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
     private Message message;
+    private final ImageFileService imageFileService;
     private final AppFileService appFileService;
     private final CityRepository repository;
     private final MessagesSourcesService messagesSourcesService;
-    public Bot(AppFileService appFileService, CityRepository repository, MessagesSourcesService messagesSourcesService) {
+    public Bot(AppFileService appFileService, CityRepository repository, MessagesSourcesService messagesSourcesService, ImageFileService imageFileService) {
         this.appFileService = appFileService;
+        this.imageFileService = imageFileService;
         this.repository = repository;
         this.messagesSourcesService = messagesSourcesService;
     }
@@ -92,6 +97,9 @@ public class Bot extends TelegramLongPollingBot {
                             City requiredCity = cities.get(0);
                             if (cityName.equals(requiredCity.getName())) {
                                 answer = requiredCity.getText();
+                                File cityImageFile = imageFileService.getImagePath(requiredCity);
+                                sendImageUploadingAFile(cityImageFile,message.getChatId().toString(),answer);
+                                break;
                             } else {
                                 answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY, lang) + requiredCity.getName() + " : " + requiredCity.getText();
                             }
@@ -125,6 +133,22 @@ public class Bot extends TelegramLongPollingBot {
             execute(sendDockRequest);
         } catch (TelegramApiException e) {
             log.error("failed to upload the application file", e);
+            e.printStackTrace();
+        }
+    }
+    public void sendImageUploadingAFile(File file, String chatId,String text) {
+        // Create send method
+        SendPhoto sendPhotoRequest = new SendPhoto();
+        // Set destination chat id
+        sendPhotoRequest.setChatId(chatId);
+        // Set the photo file as a new photo (You can also use InputStream with a constructor overload)
+        sendPhotoRequest.setPhoto(new InputFile(file));
+        sendPhotoRequest.setCaption(text);
+        try {
+            // Execute the method
+            execute(sendPhotoRequest);
+        } catch (TelegramApiException e) {
+            log.error(e.getLocalizedMessage(),e);
             e.printStackTrace();
         }
     }
