@@ -21,7 +21,7 @@ public class City implements Serializable {
     private String name;
     private Timestamp dateCreated;
     private Timestamp dateLastModification;
-    private transient String picture;
+    private String picture;
 
     public City() {
         this.dateCreated = new Timestamp(new Date().getTime());
