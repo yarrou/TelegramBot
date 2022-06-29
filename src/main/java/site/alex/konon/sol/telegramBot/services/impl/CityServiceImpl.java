@@ -1,6 +1,7 @@
 package site.alex.konon.sol.telegramBot.services.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import site.alex.konon.sol.telegramBot.entity.City;
 import site.alex.konon.sol.telegramBot.repository.CityRepository;
 import site.alex.konon.sol.telegramBot.services.CityService;
@@ -16,7 +17,7 @@ public class CityServiceImpl implements CityService {
     private final CityRepository repository;
     private final ImageFileService service;
 
-    public CityServiceImpl(CityRepository repository,ImageFileService service) {
+    public CityServiceImpl(CityRepository repository, ImageFileService service) {
         this.repository = repository;
         this.service = service;
     }
@@ -31,14 +32,12 @@ public class CityServiceImpl implements CityService {
     @Override
     public City getCityByName(String name) {
         City city = repository.findByName(name);
-        city.setPicture(service.getImageAsString(city));
         return city;
     }
 
-    @Override
+    @Deprecated
     public List<City> findCity(String name) {
-        List<City> cities = repository.findByNameStartingWith(name);
-        return cities.stream().peek(x -> x.setPicture(service.getImageAsString(x))).collect(Collectors.toList());
+        return repository.findByNameStartingWith(name);
     }
 
     @Override
@@ -46,7 +45,6 @@ public class CityServiceImpl implements CityService {
         if (!repository.existsByName(city.getName())) {
             city.setDateCreated(new Timestamp(new Date().getTime()));
             city.setDateLastModification(new Timestamp(0));
-            service.writeImageFromString(city);
             repository.save(city);
             return true;
         } else return false;
@@ -58,7 +56,6 @@ public class CityServiceImpl implements CityService {
         if (town != null) {
             town.setText(city.getText());
             town.setDateLastModification(new Timestamp(new Date().getTime()));
-            service.writeImageFromString(city);
             repository.save(town);
             return true;
         } else return false;
@@ -71,5 +68,28 @@ public class CityServiceImpl implements CityService {
             repository.delete(town);
             return true;
         } else return false;
+    }
+
+    @Override
+    public void saveCity(City city, MultipartFile file) {
+        City town = repository.findByName(city.getName());
+        String link = service.saveImage(city, file);
+        if (town != null) {
+            town.setText(city.getText());
+            town.setDateLastModification(new Timestamp(new Date().getTime()));
+            town.setPicture(link);
+            repository.save(town);
+        } else {
+            city.setDateCreated(new Timestamp(new Date().getTime()));
+            city.setDateLastModification(new Timestamp(0));
+            city.setPicture(link);
+            repository.save(city);
+        }
+
+    }
+
+    @Override
+    public boolean isExist(City city) {
+        return repository.existsByName(city.getName());
     }
 }
