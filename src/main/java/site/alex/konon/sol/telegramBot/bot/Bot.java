@@ -98,7 +98,7 @@ public class Bot extends TelegramLongPollingBot {
                             if (cityName.equals(requiredCity.getName())) {
                                 answer = requiredCity.getText();
                                 File cityImageFile = imageFileService.getImageFile(requiredCity);
-                                sendImageUploadingAFile(cityImageFile,message.getChatId().toString(),answer);
+                                sendImageUploadingAFile(requiredCity,message.getChatId().toString(),answer);
                                 break;
                             } else {
                                 answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY, lang) + requiredCity.getName() + " : " + requiredCity.getText();
@@ -136,13 +136,13 @@ public class Bot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
-    public void sendImageUploadingAFile(File file, String chatId,String text) {
+    public void sendImageUploadingAFile(City city, String chatId,String text) {
         // Create send method
         SendPhoto sendPhotoRequest = new SendPhoto();
         // Set destination chat id
         sendPhotoRequest.setChatId(chatId);
         // Set the photo file as a new photo (You can also use InputStream with a constructor overload)
-        sendPhotoRequest.setPhoto(new InputFile(file));
+        sendPhotoRequest.setPhoto(imageFileService.getInputFile(city));
         sendPhotoRequest.setCaption(text);
         try {
             // Execute the method
