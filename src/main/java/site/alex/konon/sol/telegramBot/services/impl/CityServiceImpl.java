@@ -73,7 +73,7 @@ public class CityServiceImpl implements CityService {
     @Override
     public void saveCity(City city, MultipartFile file) {
         City town = repository.findByName(city.getName());
-        String link = service.saveImage(city, file);
+        String link = service.saveImageInS3(city, file);
         if (town != null) {
             town.setText(city.getText());
             town.setDateLastModification(new Timestamp(new Date().getTime()));
