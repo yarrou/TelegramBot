@@ -1,6 +1,7 @@
 package site.alex.konon.sol.telegramBot.bot;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -141,7 +142,8 @@ public class Bot extends TelegramLongPollingBot {
         // Set destination chat id
         sendPhotoRequest.setChatId(chatId);
         // Set the photo file as a new photo (You can also use InputStream with a constructor overload)
-        sendPhotoRequest.setPhoto(imageFileService.getInputFile(city));
+        InputFile inputFile = imageFileService.getInputFile(city);
+        sendPhotoRequest.setPhoto(inputFile);
         sendPhotoRequest.setCaption(text);
         try {
             // Execute the method
@@ -149,6 +151,10 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             log.error(e.getLocalizedMessage(), e);
             e.printStackTrace();
+        }
+        finally {
+            //close the inputStream
+            IOUtils.closeQuietly(inputFile.getNewMediaStream());
         }
     }
 
