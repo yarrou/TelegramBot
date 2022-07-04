@@ -1,6 +1,7 @@
 package site.alex.konon.sol.telegramBot.bot;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -20,7 +21,6 @@ import site.alex.konon.sol.telegramBot.services.AppFileService;
 import site.alex.konon.sol.telegramBot.services.ImageFileService;
 import site.alex.konon.sol.telegramBot.services.MessagesSourcesService;
 
-import java.io.File;
 import java.util.ArrayList;
 
 @Slf4j
@@ -30,11 +30,11 @@ public class Bot extends TelegramLongPollingBot {
     private String botUsername;
     @Value("${bot.token}")
     private String botToken;
-    private Message message;
     private final ImageFileService imageFileService;
     private final AppFileService appFileService;
     private final CityRepository repository;
     private final MessagesSourcesService messagesSourcesService;
+
     public Bot(AppFileService appFileService, CityRepository repository, MessagesSourcesService messagesSourcesService, ImageFileService imageFileService) {
         this.appFileService = appFileService;
         this.imageFileService = imageFileService;
@@ -68,12 +68,12 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        message = update.getMessage();
+        Message message = update.getMessage();
         String nameUser = message.getFrom().getUserName();
         String lang = getUserLang(message);
         String signatureUser = message.getFrom().toString();
         log.info("new message from {} : {}", nameUser, signatureUser);
-        if (message != null && message.hasText()) {
+        if (message.hasText()) {
             String cityName = message.getText();
             log.info("message is {}", cityName);
             String answer = messagesSourcesService.getStringValue(MessagesSourcesService.UNKNOWN_CITY, lang);
@@ -97,8 +97,7 @@ public class Bot extends TelegramLongPollingBot {
                             City requiredCity = cities.get(0);
                             if (cityName.equals(requiredCity.getName())) {
                                 answer = requiredCity.getText();
-                                File cityImageFile = imageFileService.getImageFile(requiredCity);
-                                sendImageUploadingAFile(requiredCity,message.getChatId().toString(),answer);
+                                sendImageUploadingAFile(requiredCity, message.getChatId().toString(), answer);
                                 break;
                             } else {
                                 answer = messagesSourcesService.getStringValue(MessagesSourcesService.SUGGESTION_CITY, lang) + requiredCity.getName() + " : " + requiredCity.getText();
@@ -106,7 +105,7 @@ public class Bot extends TelegramLongPollingBot {
                         } else {
                             StringBuilder builder = new StringBuilder(messagesSourcesService.getStringValue(MessagesSourcesService.LIST_CITY, lang));
                             for (City city : cities) {
-                                builder.append(city.getName() + ",");
+                                builder.append(city.getName()).append(",");
                             }
                             builder.append(messagesSourcesService.getStringValue(MessagesSourcesService.CLARIFY_CITY, lang));
                             answer = builder.toString();
@@ -136,20 +135,26 @@ public class Bot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
-    public void sendImageUploadingAFile(City city, String chatId,String text) {
+
+    public void sendImageUploadingAFile(City city, String chatId, String text) {
         // Create send method
         SendPhoto sendPhotoRequest = new SendPhoto();
         // Set destination chat id
         sendPhotoRequest.setChatId(chatId);
         // Set the photo file as a new photo (You can also use InputStream with a constructor overload)
-        sendPhotoRequest.setPhoto(imageFileService.getInputFile(city));
+        InputFile inputFile = imageFileService.getInputFile(city);
+        sendPhotoRequest.setPhoto(inputFile);
         sendPhotoRequest.setCaption(text);
         try {
             // Execute the method
             execute(sendPhotoRequest);
         } catch (TelegramApiException e) {
-            log.error(e.getLocalizedMessage(),e);
+            log.error(e.getLocalizedMessage(), e);
             e.printStackTrace();
+        }
+        finally {
+            //close the inputStream
+            IOUtils.closeQuietly(inputFile.getNewMediaStream());
         }
     }
 
